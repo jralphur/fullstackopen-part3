@@ -47,13 +47,55 @@ app.use(body_parser.json())
 
 app.get('/api/persons', (req, res) => {
     if (!phonebook.length) {
-        return res.status(404).json();
+        return res.status(404).end();
     }
     res.json(phonebook)
 })
 
+app.get('/api/persons/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const person = phonebook.find(person => person.id === id)
+
+  if (!person) {
+    res.status(404).end();
+  } else {
+    res.json(person);
+  }
+})
+
 app.get('/info', (req, res) => {
     res.send(`<div><p>Phonebook has info for ${phonebook.length} people</p><p>${new Date()}</p></div>`)
+})
+
+app.delete('/api/persons/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const person = phonebook.find(person => person.id === id)
+
+  if (!person) {
+    console.log("app.delete()")
+    return res.status(404).end()
+  }
+
+  phonebook = phonebook.filter(person => person.id === id)
+  res.status(200).end();
+})
+
+app.post('/api/persons', (req, res) => {
+  const { body, name } = req.body
+  if (!body || !name ) {
+    return res.status(400).json({error: "content missing"});
+  }
+
+  if (phonebook.find(person => person.name == name)) {
+    return res.status(400).json({error: "number already exists"})
+  }
+
+  const newPerson = {
+    name, number, id: Math.floor(Math.random() * (Math.pow(2, 32) - 1))
+  }
+
+  phonebook = phonebook.concat(newPerson)
+  req.json(newPerson)
 })
 
 const PORT = 3001;
