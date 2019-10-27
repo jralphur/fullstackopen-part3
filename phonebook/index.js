@@ -82,7 +82,7 @@ app.delete('/api/persons/:id', (req, res) => {
 
 app.post('/api/persons', (req, res) => {
   const { body, name } = req.body
-  if (!body || !name ) {
+  if (!body || !name ) {contentcontent
     return res.status(400).json({error: "content missing"});
   }
 
