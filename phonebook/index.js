@@ -1,6 +1,7 @@
 const express     = require('express')
 const app         = express()
 const body_parser = require('body-parser')
+const morgan      = require('morgan')
 let phonebook   = [
       {
         "name": "szaasdd",
@@ -43,7 +44,12 @@ let phonebook   = [
         "id": 13
       }
 ]
+morgan.token('json', (req, res) => {
+  return JSON.stringify(req.body);
+})
+
 app.use(body_parser.json())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :json'))
 
 app.get('/api/persons', (req, res) => {
     if (!phonebook.length) {
