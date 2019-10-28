@@ -1,7 +1,7 @@
 const express     = require('express')
 const app         = express()
 const body_parser = require('body-parser')
-const phonebook   = [
+let phonebook   = [
       {
         "name": "szaasdd",
         "number": "efefdsf",
@@ -77,12 +77,12 @@ app.delete('/api/persons/:id', (req, res) => {
   }
 
   phonebook = phonebook.filter(person => person.id === id)
-  res.status(200).end();
+  res.status(204).end();
 })
 
 app.post('/api/persons', (req, res) => {
-  const { body, name } = req.body
-  if (!body || !name ) {contentcontent
+  const { number, name } = req.body
+  if (!number || !name ) {
     return res.status(400).json({error: "content missing"});
   }
 
@@ -95,7 +95,7 @@ app.post('/api/persons', (req, res) => {
   }
 
   phonebook = phonebook.concat(newPerson)
-  req.json(newPerson)
+  res.json(newPerson)
 })
 
 const PORT = 3001;
