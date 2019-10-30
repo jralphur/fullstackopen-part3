@@ -81,7 +81,7 @@ app.get('/info', (req, res) => {
 app.delete('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id);
   const person = phonebook.find(person => person.id === id)
-
+  console.log(person)
   if (person === undefined) {
     console.log("app.delete()")
     return res.status(404).end()
