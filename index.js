@@ -48,6 +48,7 @@ let phonebook   = [
 ]
 
 app.use(cors())
+app.use(express.static('build'))
 morgan.token('json', (req, res) => {
   return JSON.stringify(req.body);
 })
