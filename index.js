@@ -82,13 +82,13 @@ app.delete('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id);
   const person = phonebook.find(person => person.id === id)
 
-  if (!person) {
+  if (person === undefined) {
     console.log("app.delete()")
     return res.status(404).end()
   }
 
   phonebook = phonebook.filter(person => person.id === id)
-  res.status(204).end();
+  res.status(204).json(person).end();
 })
 
 app.post('/api/persons', (req, res) => {
