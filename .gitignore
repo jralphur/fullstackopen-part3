@@ -62,3 +62,5 @@ typings/
 
 # other
 requests/
+
+phonebook/node_modules
