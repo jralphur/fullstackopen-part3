@@ -59,21 +59,6 @@ morgan.token('json', (req, res) => {
 app.use(body_parser.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :json'))
 
-const errorHandler = (error, request, response, next) => {
-  console.error("[ERROR]", error)
-  //console.error(error.message)
-
-  if (error.name === 'CastError' && error.kind === 'ObjectId') {
-    return response.status(400).send({ error: 'malformmed id' })
-  } if (error.name === 'ValidatorError') {
-    return response.status(400).send({ error: error.message })
-  }
-
-  next(error)
-}
-
-app.use(errorHandler)
-
 app.get('/api/persons', (req, res, next) => {
   Phone.find({})
     .then(people => {
@@ -127,11 +112,8 @@ app.post('/api/persons', (req, res, next) => {
     name: _name, number: _number
   })
   newPerson.save().then(response => {
-    console.log('saving')
     res.json(response.toJSON());
   }).catch((error) => {
-    console.error("[ERROR]\n", error)
-    console.error("END ERROR")
     next(error)
   })
 })
@@ -153,6 +135,27 @@ app.put('/api/persons/:id', (req, res, next) => {
     .then(newPerson => res.json(newPerson.toJSON()))
     .catch(error => next(error))
 })
+
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.error("[ERROR]", error.message)
+  //console.error(error.message)
+
+  if (error.name === 'CastError' && error.kind === 'ObjectId') {
+    return response.status(400).send({ error: 'malformmed id' })
+  } if (error.name === 'ValidationError') {
+    return response.status(400).send({ error: error.message })
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
