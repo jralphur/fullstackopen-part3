@@ -121,7 +121,7 @@ app.post('/api/persons', (req, res, next) => {
   if (!_number || !_name ) {
     return res.status(400).json({error: "content missing"});
   }
-  
+
   const newPerson = new Phone({
     name: _name, number: _number
   })
@@ -129,6 +129,7 @@ app.post('/api/persons', (req, res, next) => {
   newPerson.save().then(response => {
     res.json(response.toJSON());
   }).catch((error) => {
+    console.log("/api/persons error")
     next(error)
   })
 })
