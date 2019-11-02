@@ -60,7 +60,8 @@ app.use(body_parser.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :json'))
 
 const errorHandler = (error, request, response, next) => {
-  console.error(error.message)
+  console.error("[ERROR]", error)
+  //console.error(error.message)
 
   if (error.name === 'CastError' && error.kind === 'ObjectId') {
     return response.status(400).send({ error: 'malformmed id' })
@@ -125,11 +126,12 @@ app.post('/api/persons', (req, res, next) => {
   const newPerson = new Phone({
     name: _name, number: _number
   })
-
   newPerson.save().then(response => {
+    console.log('saving')
     res.json(response.toJSON());
   }).catch((error) => {
-    console.log("/api/persons error")
+    console.error("[ERROR]\n", error)
+    console.error("END ERROR")
     next(error)
   })
 })
