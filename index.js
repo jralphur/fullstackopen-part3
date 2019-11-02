@@ -121,26 +121,16 @@ app.post('/api/persons', (req, res, next) => {
   if (!_number || !_name ) {
     return res.status(400).json({error: "content missing"});
   }
+  
+  const newPerson = new Phone({
+    name: _name, number: _number
+  })
 
-  Phone.find({ name: _name })
-    .then((people) => {
-      if (people.length)
-        return res.status(400).json({error: "number already exists" });
-
-      const newPerson = new Phone({
-        name: _name, number: _number
-      })
-
-      newPerson.save().then(response => {
-        res.json(response.toJSON());
-      }).catch((error) => {
-        next(error)
-      })
-
-    })
-    .catch((error) => {
-      next(error)
-    })
+  newPerson.save().then(response => {
+    res.json(response.toJSON());
+  }).catch((error) => {
+    next(error)
+  })
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
