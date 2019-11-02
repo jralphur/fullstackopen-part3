@@ -58,29 +58,43 @@ morgan.token('json', (req, res) => {
 app.use(body_parser.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :json'))
 
-app.get('/api/persons', (req, res) => {
-  Phone.find({}).then(people => {
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError' && error.kind === 'ObjectId') {
+    return response.status(400).send({ error: 'malformmed id' })
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
+
+app.get('/api/persons', (req, res, next) => {
+  Phone.find({})
+    .then(people => {
     res.json(people.map(p => p.toJSON()));
   })
+    .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
   Phone.findById(req.params.id)
     .then(person => {
       res.json(person.toJSON())
     })
     .catch(error => {
-      res.status(404).json()
+      next(error)
     })
 })
 
-app.get('/info', (req, res) => {
+app.get('/info', (req, res, next) => {
   Phone.countDocuments({}, (error, count) => {
     res.send(`<div><p>Phonebook has info for ${count} people</p><p>${new Date()}</p></div>`)
-  }).catch(error => console.log("/info ", error))
+  }).catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
   // const id = Number(req.params.id);
   // const person = phonebook.find(person => person.id === id)
   // if (person === undefined) {
@@ -95,12 +109,10 @@ app.delete('/api/persons/:id', (req, res) => {
         return res.status(204).end();
       return res.status(404).end();
     })
-    .catch(error => console.log(error))
-  
-  
+    .catch(error => next(error))
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const _name = req.body.name;
   const _number = req.body.number;
   if (!_number || !_name ) {
@@ -119,13 +131,31 @@ app.post('/api/persons', (req, res) => {
       newPerson.save().then(response => {
         res.json(response.toJSON());
       }).catch((error) => {
-        console.err("get /api/persons", error.message)
+        next(error)
       })
 
     })
     .catch((error) => {
-      console.log("error:", error.message)
+      next(error)
     })
+})
+
+app.put('/api/persons/:id', (req, res, next) => {
+  const body = req.body
+
+  if (!body.name || !body.number)  {
+    return res.status(400).end()
+  }
+
+  const person = {
+    name: body.name,
+    number: body.number
+  }
+  
+  console.log('app.put')
+  Phone.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then(newPerson => res.json(newPerson.toJSON()))
+    .catch(error => next(error))
 })
 
 const PORT = process.env.PORT || 3001;
