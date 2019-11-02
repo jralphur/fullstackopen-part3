@@ -1,9 +1,10 @@
 require('dotenv').config()
-const express     = require('express')
-const body_parser = require('body-parser')
-const morgan      = require('morgan')
-const cors        = require('cors')
-const Phone       = require('./models/phonebook')
+const express            = require('express')
+const body_parser        = require('body-parser')
+const morgan             = require('morgan')
+const cors               = require('cors')
+const Phone              = require('./models/phonebook')
+
 const app         = express()
 let phonebook   = [
       {
@@ -63,6 +64,8 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === 'CastError' && error.kind === 'ObjectId') {
     return response.status(400).send({ error: 'malformmed id' })
+  } if (error.name === 'ValidationError') {
+    return response.status(400).send({error: error.message })
   }
 
   next(error)
