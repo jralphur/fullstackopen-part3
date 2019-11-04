@@ -61,5 +61,6 @@ typings/
 .next
 
 # other
-requests/
-build/
+requests
+build
+.vscode
